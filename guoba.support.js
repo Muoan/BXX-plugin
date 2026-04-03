@@ -8,7 +8,7 @@ export function supportGuoba() {
             name: 'BXX-plugin',
             title: '不羡仙插件',
             author: '@不羡仙',
-            authorLink: 'https://github.com/ymoan/BXX-plugin',
+            authorLink: 'https://github.com/Muoan/BXX-plugin',
             isV3: true,
             isV2: false,
             description: '不羡仙插件提供娱乐/管理/API功能，Yunzai论坛：https://yunz.cc，交流群：872488071',
