@@ -1,6 +1,6 @@
 {
   "name": "BXX-plugin",
-  "version": "V 0.3.3",
+  "version": "V 0.3.4",
   "author": "@MoAn",
   "type": "module",
   "dependencies": {

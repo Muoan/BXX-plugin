@@ -61,6 +61,16 @@ export const helpList = [
                 "desc": "解析爬取老福特文章里的图片"
             },
             {
+                "icon": 5,
+                "title": "#XX火车站大屏",
+                "desc": "查看某地某站点的火车站大屏信息"
+            },
+            {
+                "icon": 8,
+                "title": "#IDC上游商品ID查询",
+                "desc": "#https://idc.cn上游商品ID查询"
+            },
+            {
                 "icon": 3,
                 "title": "#一键卸崽",
                 "desc": "一键跑路！删除可删除的文件！慎用！"

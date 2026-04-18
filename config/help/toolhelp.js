@@ -51,11 +51,6 @@ export const helpList = [
                 "desc": "邮箱的配置文件，建议使用锅巴填写"
             },
             {
-                "icon": 5,
-                "title": "#XX火车站大屏",
-                "desc": "查看某地某站点的火车站大屏信息"
-            },
-            {
                 "icon": 13,
                 "title": "#不羡仙设置",
                 "desc": "设置不羡仙权限"

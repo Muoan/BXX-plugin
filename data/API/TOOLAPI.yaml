@@ -1,2 +1,4 @@
 # 12306大屏
 12306API: "https://api.nanyinet.com/api/gateway/12306/api.php"
+# IDC查询
+IDCAPI: "https://api.nanyinet.com/api/gateway/idcsmart/api"
