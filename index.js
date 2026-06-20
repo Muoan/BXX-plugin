@@ -1,81 +1,53 @@
-import { readdir, stat } from 'node:fs/promises';
-import { dirname, join, basename, sep } from 'node:path';
-import chalk from 'chalk';
-import { fileURLToPath, pathToFileURL } from 'url';
+import r from "node:fs"
+import t from "node:path"
+import { fileURLToPath, pathToFileURL } from "node:url"
+import a from "chalk"
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const APPS_DIR = join(__dirname, 'apps');
+const __dirname = t.dirname(fileURLToPath(import.meta.url))
+const e = t.basename(__dirname)
+const c = Date.now()
+let s = 0, l = 0
 
-let successCount = 0;
-let failureCount = 0;
-const startTime = Date.now();
-const apps = {};
-
-logger.info(`\t${chalk.cyan('不羡仙后门执行所有数据载入云端中...')}`);
-
-async function getJSFiles(dir) {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const jsFiles = [];
-  
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    
-    if (entry.isDirectory()) {
-      const subFiles = await getJSFiles(fullPath);
-      jsFiles.push(...subFiles);
-    } else if (entry.isFile() && entry.name.endsWith('.js')) {
-      const relativePath = fullPath.replace(APPS_DIR + sep, '');
-      const identifier = relativePath
-        .replace(/\.js$/, '')
-        .replace(/\\/g, '/')  
-        .split('/')
-        .join('.');  
-      
-      jsFiles.push({
-        identifier,
-        filePath: fullPath
-      });
-    }
-  }
-  
-  return jsFiles;
-}
+let apps = {}
 
 try {
-  const jsFiles = await getJSFiles(APPS_DIR);
-  
-  const loadModules = jsFiles.map(async ({ identifier, filePath }) => {
-    try {
-      const fileUrl = pathToFileURL(filePath).href;
-      const moduleExports = await import(fileUrl);
-      const defaultExport = 
-        moduleExports?.default || 
-        moduleExports[Object.keys(moduleExports)[0]];
-      
-      apps[identifier] = defaultExport;
-      successCount++;
-    } catch (error) {
-      logger.error(`不羡仙所有数据载入云端失败！：${chalk.red(identifier)}`);
-      logger.error(error);
-      failureCount++;
+  let files = []
+  function walk(dir) {
+    for (let entry of r.readdirSync(dir, { withFileTypes: true })) {
+      let p = t.join(dir, entry.name)
+      if (entry.isDirectory()) walk(p)
+      else if (entry.name.endsWith(".js")) files.push(p)
     }
-  });
+  }
+  walk(t.join(__dirname, "apps"))
 
-  await Promise.allSettled(loadModules);
-
-} catch (error) {
-  logger.error(`读取文件时出错：${chalk.red(error.message)}`);
+  await Promise.all(files.map(async (file) => {
+    try {
+      let name = t.basename(file, ".js")
+      let mod = await import(pathToFileURL(file).href)
+      apps[name] = mod.default || mod[Object.keys(mod)[0]]
+      s++
+    } catch (err) {
+      let name = t.basename(file)
+      if (err?.code === "ERR_MODULE_NOT_FOUND") {
+      } else {
+        logger.error(`[${e}] 载入 ${name} 错误：`, err)
+      }
+      l++
+    }
+  }))
+} catch (err) {
+  logger.error(`[${e}] 载入插件时发生错误/(ㄒoㄒ)/~~`, err)
 }
 
-const endTime = Date.now();
-const elapsedTime = ((endTime - startTime) / 1000).toFixed(2);
+let o = Date.now() - c
+let line = "-".repeat(30)
+let colors = [a.cyanBright.bold, a.greenBright.bold, a.magentaBright.bold, a.yellowBright.bold]
+//启动状态来源：偷取的Yunzai-DF-plugin，感谢Yunzai-DF-plugin
+logger.info(line)
+let msgs = [`${e} 加载完成 (*^▽^*)`, `成功: ${s} 个`, l > 0 ? `失败: ${l}` : `没有失败 (～￣▽￣)~`]
+msgs.forEach((msg, i) => logger.info(colors[i % colors.length](msg)))
+logger.info(`✅  总耗时: ${o} ms`)
+logger.info(line)
 
-logger.info(chalk.cyan('-------------------'));
-logger.info(chalk.green('不羡仙后门数据载入完成'));
-logger.info(`成功加载：${chalk.green(successCount)} 个`);
-logger.info(`加载失败：${chalk.red(failureCount)} 个`);
-logger.info(`总耗时：${chalk.yellow(elapsedTime)} 秒`);
-logger.info(chalk.cyan('-------------------'));
-
-export { apps };
+export { apps }
